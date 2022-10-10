@@ -61,3 +61,9 @@ manage_hpp_files( ${hpp_files} )
 add_executable( ${PROJECT_NAME} ${header_files} ${source_files} ${hpp_files} ${moc_list} ${generated_ui_files} ${generated_qrc_files} )
 target_link_libraries( ${PROJECT_NAME} ${MAIN_PROJECT_NAME} ${EXTERNAL_LIBS_LIBRARIES} )
 qt5_use_modules(${PROJECT_NAME} Widgets OpenGL Sql)
+
+# vtk_module_autoinit is needed
+vtk_module_autoinit(
+  TARGETS ${PROJECT_NAME}
+  MODULES ${VTK_LIBRARIES}
+)

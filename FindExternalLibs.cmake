@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------
 # Set External libraries path
 # ------------------------------------------------------------------------------
-set( EXTERNAL_LIBS_DIR "C:/ExternalLibs" CACHE STRING "External libs Dir" )
+set( EXTERNAL_LIBS_DIR "/usr/local/ExternalLibs" CACHE STRING "External libs Dir" )
 
 # ------------------------------------------------------------------------------
 # set External libraries version
@@ -37,7 +37,7 @@ endif()
 if( NOT EXISTS ${ITK_DIR2} )
     message( SEND_ERROR "Cant't find ITK in ${EXTERNAL_LIBS_DIR}" )
 else()
-	set( ITK_DIR "${ITK_DIR2}/lib/cmake/ITK-5.1")
+	set( ITK_DIR "${ITK_DIR2}/lib/cmake/ITK-5.2")
 	find_package( ITK REQUIRED )
 	include( ${ITK_USE_FILE} )	
 endif()

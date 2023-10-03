@@ -55,5 +55,54 @@ int main(int p_argc, char* p_argv[])
 	std::cout << "Spacing X:" << image->GetSpacing()[0] << std::endl;
 	std::cout << "Spacing Y:" << image->GetSpacing()[1] << std::endl;
 	
+	//START EXERCICE 2
+
+	//Create const iterator for the iteration on the entire image
+	itk::ImageRegionConstIterator<UCharImageType> globalIterator(image, image->GetLargestPossibleRegion());
+
+	//Initialize iterator to beginning
+
+	//Iterate over the entire image to count the number of pixels
+
+	int nbPixels = 0;
+	while () //Iterator IsAtEnd()
+	{
+		//To print the pixel value - Method Get
+
+
+		//Increment number of pixels
+
+
+		//Increment iterator
+	}
+
+	std::cout << "Number of pixels (512, 512) =" << nbPixels << std::endl;
+
+	//Create a region for iterate over a part of the image
+	UCharImageType::RegionType regionForIteration;
+
+	//Define starting pixel for iteration
+	UCharImageType::IndexType startingPixel;
+
+	//Define size of region for iteration
+
+	//Create non const iterator to fill the image with the rectangle
+
+	nbPixels = 0;
+
+	while ()
+	{
+		//Set a value to the pixel - Method Set
+
+		//Increment number of set pixels
+
+		//Increment iterator
+
+	}
+
+	std::cout << "Number of pixels set:" << nbPixels << std::endl;
+
+	//Access to a specific pixel - GetPixel(index)
+
 	return 0;
 } 

@@ -8,6 +8,8 @@ if(POLICY CMP0020)
   cmake_policy(SET CMP0020 NEW)
 endif()
 
+set(CMAKE_OSX_ARCHITECTURES "x86_64")
+
 include(FindGlobalFunctions.cmake)
 include(FindExternalLibs.cmake)
 

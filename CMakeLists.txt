@@ -25,10 +25,10 @@ file( GLOB_RECURSE qrc_files *.qrc )
 #-----------------------------------------------------------
 # Manage moc files
 #-----------------------------------------------------------
-find_moc_files( mocable_files ${header_files} )
-qt5_wrap_cpp( moc_list ${mocable_files} )
-qt5_wrap_ui( generated_ui_files ${ui_files} )
-qt5_add_resources( generated_qrc_files ${qrc_files} )
+#find_moc_files( mocable_files ${header_files} )
+#qt5_wrap_cpp( moc_list ${mocable_files} )
+#qt5_wrap_ui( generated_ui_files ${ui_files} )
+#qt5_add_resources( generated_qrc_files ${qrc_files} )
 
 
 #-----------------------------------------------------------
@@ -37,9 +37,9 @@ qt5_add_resources( generated_qrc_files ${qrc_files} )
 source_group_sources( ${header_files} )
 source_group_sources( ${source_files} )
 source_group_sources( ${hpp_files} )
-source_group_mocs( ${moc_list} )
-source_group_qrcs( ${qrc_files} )
-source_group_generated_qrcs( ${generated_qrc_files} )
+#source_group_mocs( ${moc_list} )
+#source_group_qrcs( ${qrc_files} )
+#source_group_generated_qrcs( ${generated_qrc_files} )
 
 
 #-----------------------------------------------------------

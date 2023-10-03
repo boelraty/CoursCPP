@@ -23,6 +23,9 @@ set( VTK_DIR2 	"${EXTERNAL_LIBS_DIR}/vtk" 		CACHE STRING "VTK Dir" )
 # ------------------------------------------------------------------------------
 find_package(Qt5Core)
 
+set (Qt_CORE_LINK_LIBRARIES Qt5::Core Qt5::Gui Qt5::Widgets)
+
+
 # ------------------------------------------------------------------------------
 # OpenGL
 # ------------------------------------------------------------------------------
@@ -49,8 +52,8 @@ if( NOT EXISTS ${VTK_DIR2} )
     message( SEND_ERROR "Cant't find VTK in ${EXTERNAL_LIBS_DIR}" )
 else()
 	set( VTK_DIR "${VTK_DIR2}/lib/cmake/vtk-9.1")
-	find_package( VTK REQUIRED )
-	include( ${VTK_USE_FILE} )	
+	find_package( VTK REQUIRED COMPONENTS RenderingCore RenderingQt GUISupportQt )
+	#include( ${VTK_USE_FILE} )	
 endif()
 
 

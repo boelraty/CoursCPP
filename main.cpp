@@ -6,24 +6,19 @@
 /*---- ITK Includes ----*/
 #include <itkImage.h>
 
-/*---- QT Includes ----*/
-#include <qdebug.h>
-
 /*---- VTK Includes ----*/
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
 int main(int p_argc, char* p_argv[])
 {
-	qDebug() << "Starting test ...";
+	std::cout << "Starting test ..." << std::endl;
 	
 	itk::Image<unsigned char, 2>::Pointer image = itk::Image<unsigned char, 2>::New();
-	qDebug() << "ITK OK";
+	std::cout << "ITK OK" << std::endl;
 
 	vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
-	qDebug() << "VTK OK";
-
-	qDebug() << "QT OK";
+	std::cout << "VTK OK" << std::endl;
 
 	return 0;
 } 

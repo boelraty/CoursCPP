@@ -11,6 +11,7 @@
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkConnectedComponentImageFilter.h>
 #include <itkRelabelComponentImageFilter.h>
+#include <itkRescaleIntensityImageFilter.h>
 
 /*---- STL Includes ----*/
 #include <string>
@@ -53,22 +54,37 @@ int main(int p_argc, char* p_argv[])
 
 		//Start EX7
 
-	//Labelize the image
-		itk::ConnectedComponentImageFilter<UCharImageType, IntImageType>::Pointer labeler =
-			itk::ConnectedComponentImageFilter<UCharImageType, IntImageType>::New();
-		//Set input = outout of reader
+		//Labelize the image
+		typedef itk::ConnectedComponentImageFilter<UCharImageType, ShortImageType> CCFilterType;
+		CCFilterType::Pointer labeler = CCFilterType::New();
+		labeler->SetInput(thresholder->GetOutput());
+		labeler->Update();
 
 		//Relabelize the image to get info about the group of found pixels
-//    itk::RelabelComponentImageFilter<IntImageType, UCharImageType>::Pointer relabeler =
+		typedef itk::RelabelComponentImageFilter<ShortImageType, UCharImageType> RelabelerType;
+		RelabelerType::Pointer relabeler = RelabelerType::New();
+		relabeler->SetInput(labeler->GetOutput());
+		relabeler->SetMinimumObjectSize(100);
+		relabeler->Update();
 
+	std::cout << "Number of found objects :" << relabeler->GetNumberOfObjects() << std::endl;
+	for (int i = 0 ; i < relabeler->GetNumberOfObjects() ; ++i)
+		std::cout << "Area of objects " << i << ":" 
+		<< relabeler->GetSizeOfObjectInPhysicalUnits(i) << std::endl;
 
-//	std::cout << "Number of found objects :" << relabeler->GetNumberOfObjects() << std::endl;
-//	for (int i = 0 ; i < relabeler->GetNumberOfObjects() ; ++i)
-//		std::cout << "Area of objects " << i << ":" << relabeler->GetSizeOfObjectInPhysicalUnits(i) << std::endl;
 
 	//Rescale the image to see colors on labelized output
-//    itk::RescaleIntensityImageFilter<UCharImageType, UCharImageType>::Pointer rescaler =
-//    ...
+	typedef itk::RescaleIntensityImageFilter<UCharImageType, UCharImageType> RescalerType;
+	RescalerType::Pointer rescaler = RescalerType::New();
+	rescaler->SetInput(relabeler->GetOutput());
+	rescaler->Update();
+
+	itk::ImageFileWriter<UCharImageType>::Pointer writer2 =
+		itk::ImageFileWriter<UCharImageType>::New();
+	writer2->SetInput(rescaler->GetOutput());
+	writer2->SetFileName("C:/rescale.png");
+	writer2->Update();
+
 
 	//Write the binary image
 //  itk::ImageFileWriter<UCharImageType>::Pointer writer = itk::ImageFileWriter<UCharImageType>::New();

@@ -1,48 +1,51 @@
 //-------------------------------------------------------------------------------------------------------------------
-/*!	\brief	Exemple4
+/*!	\brief	Exemple5
 *	\file	main.cpp
 *///-----------------------------------------------------------------------------------------------------------------
 
 /*---- ITK Includes ----*/
 #include <itkImage.h>
-#include <itkImageRegionConstIterator.h>
 #include <itkImageFileReader.h>
+#include <itkImageFileWriter.h>
+#include <itkGDCMImageIO.h>
+
+/*---- STL Includes ----*/
+#include <string>
+
 
 int main(int p_argc, char* p_argv[])
 {
-	//Typedef to define a image type
-	typedef itk::Image<unsigned char, 2> UCharImageType;
+	//Typedef to define a image type (refer to exercice 1 and replace unsigned char with signed short)
+
+	//Create the GDCM image IO
 
 	//Create the reader to read an image
-	itk::ImageFileReader<UCharImageType>::Pointer reader = itk::ImageFileReader<UCharImageType>::New();
-	reader->SetFileName("C:/test.png");
-	reader->Update();
+	itk::ImageFileReader<ShortImageType>::Pointer reader = itk::ImageFileReader<ShortImageType>::New();
+
 
 	//Write dimensions and spacing
-	std::cout << "Dimensions X :" << reader->GetOutput()->GetLargestPossibleRegion().GetSize()[0] << std::endl;
-	std::cout << "Dimensions Y :" << reader->GetOutput()->GetLargestPossibleRegion().GetSize()[1] << std::endl;
-	std::cout << "Spacing X :" << reader->GetOutput()->GetSpacing()[0] << std::endl;
-	std::cout << "Spacing Y :" << reader->GetOutput()->GetSpacing()[1] << std::endl;
+	//std::cout << "Dimensions X :" << reader->GetOutput()->GetLargestPossibleRegion().GetSize()[0];
 
-	//Create an iterator to check if the image contains the rectangle
-	itk::ImageRegionConstIterator<UCharImageType> iterator(reader->GetOutput(), reader->GetOutput()->GetLargestPossibleRegion());
 
-	//Initialize iterator to begin (GoToBegin())
-	iterator.GoToBegin();
+	//Check information from the GDCM ImageIO
+	char* patientname = new char;
+	char* patientbirthdate = new char;
+	char* patientid = new char;
+	char* studydate = new char;
+	std::string modality;
 
-	int nbPixels = 0;
+	//Get DICOM data
+	//gdcmImageIO->Get...
 
-	while (!iterator.IsAtEnd())
-	{
-		//Check if pixel = 255
-		if (iterator.Get() == static_cast<unsigned char>(255))
-			++nbPixels;
+	std::cout << "Patient name :" << patientname << std::endl;
+	//...
+	std::cout << "Modality :" << modality.c_str() << std::endl;
 
-		//Increment iterator
-		++iterator;
-	}
 
-	std::cout << "Nb pixels equal to 255 :" << nbPixels << std::endl;
-
+	//Delete allocated pointers
+	delete[] patientname;
+	delete[] patientbirthdate;
+	delete[] patientid;
+	delete[] studydate;
 	return 0;
 }

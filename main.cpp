@@ -9,6 +9,8 @@
 #include <itkImageFileWriter.h>
 #include <itkGDCMImageIO.h>
 #include <itkBinaryThresholdImageFilter.h>
+#include <itkConnectedComponentImageFilter.h>
+#include <itkRelabelComponentImageFilter.h>
 
 /*---- STL Includes ----*/
 #include <string>
@@ -50,6 +52,12 @@ int main(int p_argc, char* p_argv[])
 		writer->Update();
 
 		//Start EX7
+
+	//Labelize the image
+		itk::ConnectedComponentImageFilter<UCharImageType, IntImageType>::Pointer labeler =
+			itk::ConnectedComponentImageFilter<UCharImageType, IntImageType>::New();
+		//Set input = outout of reader
+
 		//Relabelize the image to get info about the group of found pixels
 //    itk::RelabelComponentImageFilter<IntImageType, UCharImageType>::Pointer relabeler =
 

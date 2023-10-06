@@ -7,6 +7,7 @@
 #include <itkImage.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
+#include <itkImageFileWriter.h>
 
 int main(int p_argc, char* p_argv[])
 {
@@ -128,8 +129,11 @@ int main(int p_argc, char* p_argv[])
 	try
 	{
 		//Create the filter to write the image
-		//itk::ImageFileWriter<UCharImageType>::Pointer writer = ;
-
+		itk::ImageFileWriter<UCharImageType>::Pointer writer =
+			itk::ImageFileWriter<UCharImageType>::New();
+		writer->SetInput(image);
+		writer->SetFileName("C:/test.png");
+		writer->Write();
 
 		std::cout << "Writing done" << std::endl;
 	}

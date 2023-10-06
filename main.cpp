@@ -49,6 +49,23 @@ int main(int p_argc, char* p_argv[])
 		writer->SetInput(thresholder->GetOutput());
 		writer->Update();
 
+		//Start EX7
+		//Relabelize the image to get info about the group of found pixels
+//    itk::RelabelComponentImageFilter<IntImageType, UCharImageType>::Pointer relabeler =
+
+
+//	std::cout << "Number of found objects :" << relabeler->GetNumberOfObjects() << std::endl;
+//	for (int i = 0 ; i < relabeler->GetNumberOfObjects() ; ++i)
+//		std::cout << "Area of objects " << i << ":" << relabeler->GetSizeOfObjectInPhysicalUnits(i) << std::endl;
+
+	//Rescale the image to see colors on labelized output
+//    itk::RescaleIntensityImageFilter<UCharImageType, UCharImageType>::Pointer rescaler =
+//    ...
+
+	//Write the binary image
+//  itk::ImageFileWriter<UCharImageType>::Pointer writer = itk::ImageFileWriter<UCharImageType>::New();
+//  //...
+
 	}
 	catch (itk::ExceptionObject& ex)
 	{

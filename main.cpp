@@ -22,7 +22,8 @@ int main(int p_argc, char* p_argv[])
 	typedef itk::Image<unsigned char, 2> UCharImageType;
 
 	//Create the reader to read an image
-	itk::ImageFileReader<UCharImageType>::Pointer reader = itk::ImageFileReader<UCharImageType>::New();
+	itk::ImageFileReader<UCharImageType>::Pointer reader 
+		= itk::ImageFileReader<UCharImageType>::New();
 	reader->SetFileName("C:/binaryimage.png");
 	reader->Update();
 
@@ -33,16 +34,13 @@ int main(int p_argc, char* p_argv[])
 	structuringElement.SetRadius(1);
 	structuringElement.CreateStructuringElement();
 
-	typedef itk::Image<unsigned char, 2> UCharImageType;
 	//Typedef to define a DilateFilter type
-	typedef itk::BinaryDilateImageFilter <	UCharImageType,
-		UCharImageType,
-		StructuringElementType> DilateFilterType;
+	typedef itk::BinaryDilateImageFilter <UCharImageType,
+		UCharImageType,	StructuringElementType> DilateFilterType;
 
 	//Typedef to define a ErodeFilter type
 	typedef itk::BinaryErodeImageFilter <	UCharImageType,
-		UCharImageType,
-		StructuringElementType> ErodeFilterType;
+		UCharImageType, StructuringElementType> ErodeFilterType;
 
 	ErodeFilterType::Pointer eroder = ErodeFilterType::New();
 	eroder->SetKernel(structuringElement);
@@ -50,13 +48,23 @@ int main(int p_argc, char* p_argv[])
 	eroder->SetErodeValue(255);
 	eroder->Update();
 
-
+	//Write the binary image
+	typedef itk::ImageFileWriter<UCharImageType> WriterType;
+	WriterType::Pointer writer1 = WriterType::New();
+	writer1->SetFileName("C:/resultImage1.png");
+	writer1->SetInput(eroder->GetOutput());
+	writer1->Update();
 
 	DilateFilterType::Pointer dilater = DilateFilterType::New();
 	dilater->SetKernel(structuringElement);
 	dilater->SetInput(eroder->GetOutput());
 	dilater->SetDilateValue(255);
 	dilater->Update();
+
+	WriterType::Pointer writer2 = WriterType::New();
+	writer2->SetFileName("C:/resultImage2.png");
+	writer2->SetInput(dilater->GetOutput());
+	writer2->Update();
 
 	//Typedef to define a FillFilter Type
 	typedef itk::GrayscaleFillholeImageFilter < UCharImageType, UCharImageType > FillFilterType;

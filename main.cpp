@@ -50,5 +50,16 @@ int main(int p_argc, char* p_argv[])
 
 	delete [] patientName;
 
+	//START EX6
+	//Create filter to apply threshold on image
+	//itk::BinaryThresholdImageFilter<ShortImageType, UCharImageType>::Pointer thresholder =
+	//Use reader->GetOutput() as input of thresholder
+
+
+
+	//Write the binary image
+	itk::ImageFileWriter<UCharImageType>::Pointer writer = itk::ImageFileWriter<UCharImageType>::New();
+	//Refer to ex 3 and use output of thresholder
+
 	return 0;
 }

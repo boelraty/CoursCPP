@@ -122,5 +122,21 @@ int main(int p_argc, char* p_argv[])
 	pixel[1] = 400;
 	std::cout << "Pixel (400, 400): " << int(image->GetPixel(pixel)) << std::endl;
 
+	//Start EXERCICE 3
+
+	//In order to catch possible error
+	try
+	{
+		//Create the filter to write the image
+		//itk::ImageFileWriter<UCharImageType>::Pointer writer = ;
+
+
+		std::cout << "Writing done" << std::endl;
+	}
+	catch (itk::ExceptionObject& ex)
+	{
+		std::cout << ex.what();
+	}
+
 	return 0;
 } 

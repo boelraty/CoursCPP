@@ -15,6 +15,8 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
 #include <vtkCubeSource.h>
+#include <vtkSTLReader.h>
+#include <vtkSTLWriter.h>
 
 
 
@@ -27,6 +29,11 @@ int main(int p_argc, char* p_argv[])
 	cubeObject->SetYLength(100);
 	cubeObject->SetZLength(200);
 	cubeObject->Update();
+
+	vtkSmartPointer<vtkSTLWriter> writer = vtkSmartPointer<vtkSTLWriter>::New();
+	writer->SetFileName("C:/mesh.stl");
+	writer->SetInputData(cubeObject->GetOutput());
+	writer->Write();
 
 	// Create mapper for the sphere
 	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();

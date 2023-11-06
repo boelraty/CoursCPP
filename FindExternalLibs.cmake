@@ -64,6 +64,7 @@ else()
 	RenderingFreeType
 	RenderingGL2PSOpenGL2
 	RenderingOpenGL2
+	IOExport
   )
 	#include( ${VTK_USE_FILE} )	
 endif()

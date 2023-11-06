@@ -58,6 +58,7 @@ else()
 	CommonDataModel
 	FiltersSources
 	InteractionStyle
+	RenderingAnnotation
 	RenderingContextOpenGL2
 	RenderingCore
 	RenderingFreeType

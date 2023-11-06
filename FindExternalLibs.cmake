@@ -52,7 +52,20 @@ if( NOT EXISTS ${VTK_DIR2} )
     message( SEND_ERROR "Cant't find VTK in ${EXTERNAL_LIBS_DIR}" )
 else()
 	set( VTK_DIR "${VTK_DIR2}/lib/cmake/vtk-9.1")
-	find_package( VTK REQUIRED CommonCore CommonDataModel IOGeometry IOXML FiltersSources FiltersGeneral)
+	find_package(VTK COMPONENTS 
+	CommonColor
+	CommonCore
+	CommonDataModel
+	FiltersSources
+	InteractionStyle
+	RenderingAnnotation
+	RenderingContextOpenGL2
+	RenderingCore
+	RenderingFreeType
+	RenderingGL2PSOpenGL2
+	RenderingOpenGL2
+	IOExport
+  )
 	#include( ${VTK_USE_FILE} )	
 endif()
 

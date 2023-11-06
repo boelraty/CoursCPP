@@ -45,7 +45,26 @@ int main(int p_argc, char* p_argv[])
 	data->GetPointData()->SetScalars(scalars);
 
 	//Create mesh related to image data
+	vtkSmartPointer<vtkMarchingCubes> marchingCubes = vtkSmartPointer<vtkMarchingCubes>::New();
+	marchingCubes->SetInputData(data);
+	marchingCubes->SetValue(0, 1);
+	marchingCubes->Update();
+
+	std::cout << "Number of triangles before:" << marchingCubes->GetOutput()->GetNumberOfPoints();
+	vtkSmartPointer<vtkDecimatePro> decimater = vtkSmartPointer<vtkDecimatePro>::New();
+	decimater->SetInputData(marchingCubes->GetOutput());
+	decimater->SetTargetReduction(0.99);
+	decimater->Update();
+	std::cout << "Number of triangles after:" << decimater->GetOutput()->GetNumberOfPoints();
+
 	
+	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper->SetInputData(decimater->GetOutput());
+
+	// Create actor related to previous mapper
+	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+	actor->SetMapper(mapper);
+	actor->GetProperty()->SetColor(1, 0, 0);
 	// Create renderer
 	vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
 
@@ -62,6 +81,7 @@ int main(int p_argc, char* p_argv[])
 	interactorWindow->SetRenderWindow(renderWindow);
 
 	// Add actor to renderer
+	renderer->AddActor(actor);
 
 	// Start rendering
 	renderWindow->Render();

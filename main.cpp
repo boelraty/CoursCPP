@@ -1,73 +1,51 @@
 //-------------------------------------------------------------------------------------------------------------------
-/*!	\brief	Exemple11
+/*!	\brief	Exemple12
 *	\file	main.cpp
 *///-----------------------------------------------------------------------------------------------------------------
 
 /*---- VTK Includes ----*/
 #include <vtkActor.h>
-#include <vtkClipPolyData.h>
-#include <vtkPlane.h>
+#include <vtkDecimatePro.h>
+#include <vtkImageData.h>
+#include <vtkMarchingCubes.h>
+#include <vtkPointData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkSTLReader.h>
 #include <vtkSmartPointer.h>
-
+#include <vtkUnsignedCharArray.h>
 
 
 int main(int p_argc, char* p_argv[])
 {
-	// Read STL file
-	vtkSmartPointer<vtkSTLReader> readerScapula = vtkSmartPointer<vtkSTLReader>::New();
-	readerScapula->SetFileName("C:/Users/vsimoes/ownCloud/CoursISEN/Data/scapula.stl");
-	readerScapula->Update();
+	// Create vtkImageData
+	vtkSmartPointer<vtkImageData> data = vtkSmartPointer<vtkImageData>::New();
+	data->SetOrigin(0, 0, 0);
+	data->SetDimensions(100, 100, 100);
+	data->SetSpacing(0.5, 0.5, 0.5);
 
-	// Create mapper for the scapula
-	vtkSmartPointer<vtkPolyDataMapper> mapperScapula = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapperScapula->SetInputData(readerScapula->GetOutput());
+	// Fill the image data
+	vtkSmartPointer<vtkUnsignedCharArray> scalars = vtkSmartPointer<vtkUnsignedCharArray>::New();
+	scalars->SetNumberOfValues(100*100*100);
 
-	// Create actor related to previous mapper
-	vtkSmartPointer<vtkActor> actorScapula = vtkSmartPointer<vtkActor>::New();
-	actorScapula->SetMapper(mapperScapula);
-	actorScapula->GetProperty()->SetColor(0.87, 0.83, 0.69);
+	for (int i = 0 ; i < 100 ; ++i)
+	{
+		for(int j = 0 ; j < 100 ; ++j)
+		{
+			for(int k = 0 ; k < 100 ; ++k)
+			{
+				if (k > 40 && k < 60 && j > 30 && j < 70 && i > 20 && i < 80)
+					scalars->SetValue(k + j * 100 + i * 100 * 100, 1);
+				else scalars->SetValue(k + j * 100 + i * 100 * 100, 0);
+			}
+		}
+	}
+	data->GetPointData()->SetScalars(scalars);
 
-	//Define Clip plane
-	vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
-	plane->SetNormal(0, 0, 1);
-
-	//Clip the scapula
-	vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
-	clipper->SetInputData(readerScapula->GetOutput());
-	clipper->SetClipFunction(plane);
-	clipper->GenerateClippedOutputOn();
-	clipper->Update();
-
-	// Create mapper for the Clip
-	vtkSmartPointer<vtkPolyDataMapper> mapperClip = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapperClip->SetInputData(clipper->GetOutput());
-
-	// Create actor related to previous mapper
-	vtkSmartPointer<vtkActor> actorClip = vtkSmartPointer<vtkActor>::New();
-	actorClip->SetMapper(mapperClip);
-	actorClip->GetProperty()->SetColor(0.87, 0.83, 0.69);
-
-
-	// Read STL file
-	vtkSmartPointer<vtkSTLReader> readerHumerus = vtkSmartPointer<vtkSTLReader>::New();
-	readerScapula->SetFileName("C:/Users/vsimoes/ownCloud/CoursISEN/Data/humerus.stl");
-	readerHumerus->Update();
-
-	// Create mapper for the humerus
-	vtkSmartPointer<vtkPolyDataMapper> mapperHumerus = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapperHumerus->SetInputData(readerHumerus->GetOutput());
-
-	// Create actor related to previous mapper
-	vtkSmartPointer<vtkActor> actorHumerus = vtkSmartPointer<vtkActor>::New();
-	actorHumerus->SetMapper(mapperHumerus);
-	actorHumerus->GetProperty()->SetColor(0.87, 0.83, 0.69);
-
+	//Create mesh related to image data
+	
 	// Create renderer
 	vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
 
@@ -84,10 +62,6 @@ int main(int p_argc, char* p_argv[])
 	interactorWindow->SetRenderWindow(renderWindow);
 
 	// Add actor to renderer
-	//renderer->AddActor(actorScapula);
-	renderer->AddActor(actorHumerus);
-	//Add ActorClip
-	renderer->AddActor(actorClip);
 
 	// Start rendering
 	renderWindow->Render();

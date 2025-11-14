@@ -7,6 +7,7 @@
 #include <itkImage.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
+#include <itkImageFileWriter.h>
 
 
 int main(int p_argc, char* p_argv[])
@@ -42,7 +43,7 @@ int main(int p_argc, char* p_argv[])
 	image->SetSpacing(spacing);
 
 	//Allocate the image in memory
-	image->Allocate();
+	image->Allocate(0);
 
 	//Check image
 	std::cout << "Dimension X:" << image->GetLargestPossibleRegion().GetSize()[0] << std::endl;
@@ -84,8 +85,8 @@ int main(int p_argc, char* p_argv[])
 
 	//Define size of region for iteration
 	UCharImageType::SizeType regionSize;
-	regionSize[0] = 100;
-	regionSize[1] = 200;
+	regionSize[0] = 200;
+	regionSize[1] = 300;
 
 	regionForIteration.SetSize(regionSize);
 	regionForIteration.SetIndex(startingPixel);
@@ -110,12 +111,16 @@ int main(int p_argc, char* p_argv[])
 	std::cout << "Number of pixels set:" << nbPixels << std::endl;
 
 	//Start EXERCICE 3
-
+//#include <itkImageFileWriter.h>
    //In order to catch possible error
 	try
 	{
 		//Create the filter to write the image
-		//itk::ImageFileWriter<UCharImageType>::Pointer writer = ;
+		itk::ImageFileWriter<UCharImageType>::Pointer writer 
+			= itk::ImageFileWriter<UCharImageType>::New();
+		writer->SetInput(image);
+		writer->SetFileName("test.png");
+		writer->Write();
 
 
 		std::cout << "Writing done" << std::endl;

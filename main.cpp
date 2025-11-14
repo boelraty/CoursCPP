@@ -5,7 +5,8 @@
 
 /*---- ITK Includes ----*/
 #include <itkImage.h>
-
+#include <itkImageRegionConstIterator.h>
+#include <itkImageRegionIterator.h>
 
 
 int main(int p_argc, char* p_argv[])
@@ -49,54 +50,64 @@ int main(int p_argc, char* p_argv[])
 	std::cout << "Spacing X:" << image->GetSpacing()[0] << std::endl;
 	std::cout << "Spacing Y:" << image->GetSpacing()[1] << std::endl;
 
+//#include <itkImageRegionConstIterator.h>
+//#include <itkImageRegionIterator.h>
+// 
 	//START EXERCICE 2
 
 	//Create const iterator for the iteration on the entire image
 	itk::ImageRegionConstIterator<UCharImageType> globalIterator(image, image->GetLargestPossibleRegion());
 
 	//Initialize iterator to beginning
+	globalIterator.GoToBegin();
 
 	//Iterate over the entire image to count the number of pixels
 	int nbPixels = 0;
-	while () //Iterator IsAtEnd()
+	while (!globalIterator.IsAtEnd())
 	{
-		//To print the pixel value - Method Get
-
-
 		//Increment number of pixels
 		++nbPixels;
 
 		//Increment iterator
+		++globalIterator;
 	}
 
 	std::cout << "Number of pixels (512, 512) =" << nbPixels << std::endl;
-
+	
 	//Create a region for iterate over a part of the image
 	UCharImageType::RegionType regionForIteration;
 
 	//Define starting pixel for iteration
 	UCharImageType::IndexType startingPixel;
+	startingPixel[0] = 50;
+	startingPixel[1] = 100;
 
 	//Define size of region for iteration
 	UCharImageType::SizeType regionSize;
+	regionSize[0] = 100;
+	regionSize[1] = 200;
+
+	regionForIteration.SetSize(regionSize);
+	regionForIteration.SetIndex(startingPixel);
 
 	//Create non const iterator to fill the image with the rectangle
+	itk::ImageRegionIterator<UCharImageType> iterator(image, regionForIteration);
+
+	iterator.GoToBegin();
 
 	nbPixels = 0;
 
-	while ()
+	while (!iterator.IsAtEnd())
 	{
 		//Set a value to the pixel - Method Set
-
+		iterator.Set(255);
 		//Increment number of set pixels
-
+		++nbPixels;
 		//Increment iterator
-
+		++iterator;
 	}
 
 	std::cout << "Number of pixels set:" << nbPixels << std::endl;
-
-	//Access to a specific pixel - GetPixel(index)
 
 	return 0;
 } 

@@ -8,6 +8,7 @@
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
 #include <itkGDCMImageIO.h>
+#include <itkBinaryThresholdImageFilter.h>
 
 /*---- STL Includes ----*/
 #include <string>
@@ -28,48 +29,32 @@ int main(int p_argc, char* p_argv[])
 	reader->SetImageIO(ioObject);
 	reader->Update();
 
-	//Write dimensions and spacing
-	std::cout << "Dimensions X :" << reader->GetOutput()->GetLargestPossibleRegion().GetSize()[0] << std::endl;
-	std::cout << "Dimensions Y :" << reader->GetOutput()->GetLargestPossibleRegion().GetSize()[1] << std::endl;
-	std::cout << "Spacing X :" << reader->GetOutput()->GetSpacing()[0] << std::endl;
-	std::cout << "Spacing Y :" << reader->GetOutput()->GetSpacing()[1] << std::endl;
+	try
+	{
+		//#include <itkBinaryThresholdImageFilter.h>
+		typedef itk::Image<unsigned char, 2> UCharImageType;
+		typedef itk::BinaryThresholdImageFilter<ShortImageType, UCharImageType> Thresholder;
 
-	//Check information from the GDCM ImageIO
-	char* patientbirthdate = new char[20];
-	char* patientid = new char[20];
-	char* studydate = new char[20];
-	std::string patientname;
-	std::string modality;
+		//Create filter to apply threshold on image
+		Thresholder::Pointer thresholder = Thresholder::New();
+		thresholder->SetInput(reader->GetOutput());
+		thresholder->SetLowerThreshold(160);
+		thresholder->SetUpperThreshold(5000);
+		thresholder->SetInsideValue(255);
+		thresholder->SetOutsideValue(0);
+		thresholder->Update();
 
-	//Get DICOM data
-	ioObject->GetValueFromTag("0010|0010", patientname);
-	ioObject->GetPatientDOB(patientbirthdate);
-	ioObject->GetPatientID(patientid);
-	ioObject->GetStudyDate(studydate);
-	ioObject->GetValueFromTag("0008|0060", modality);
+		//Write the binary image
+		itk::ImageFileWriter<UCharImageType>::Pointer writer
+			= itk::ImageFileWriter<UCharImageType>::New();
+		writer->SetInput(thresholder->GetOutput());
+		writer->SetFileName("image.png");
+		writer->Write();
 
-	std::cout << "Patient name :" << patientname << std::endl;
-	std::cout << "Patient DOB :" << patientbirthdate << std::endl;
-	std::cout << "Patient ID :" << patientid << std::endl;
-	std::cout << "Study Date :" << studydate << std::endl;
-
-	std::cout << "Modality :" << modality.c_str() << std::endl;
-
-
-	//Delete allocated pointers
-	delete[] patientbirthdate;
-	delete[] patientid;
-	delete[] studydate;
-
-
-	//Create filter to apply threshold on image
-	//itk::BinaryThresholdImageFilter<ShortImageType, UCharImageType>::Pointer thresholder =
-	//Use reader->GetOutput() as input of thresholder
-
-
-	//Write the binary image
-	itk::ImageFileWriter<UCharImageType>::Pointer writer = itk::ImageFileWriter<UCharImageType>::New();
-	//Refer to ex 3 and use output of thresholder
-
+	}
+	catch (std::exception& ex)
+	{
+		std::cout << ex.what() << std::endl;
+	}
 	return 0;
 }

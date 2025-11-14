@@ -6,7 +6,6 @@
 /*---- ITK Includes ----*/
 #include <itkImage.h>
 #include <itkImageFileReader.h>
-#include <itkImageFileWriter.h>
 #include <itkGDCMImageIO.h>
 
 /*---- STL Includes ----*/
@@ -19,32 +18,44 @@ int main(int p_argc, char* p_argv[])
 	typedef itk::Image<short, 2> ShortImageType;
 
 	//Create the GDCM image IO
+	itk::GDCMImageIO::Pointer ioObject = itk::GDCMImageIO::New();
 
 	//Create the reader to read an image
-	itk::ImageFileReader<ShortImageType>::Pointer reader = itk::ImageFileReader<ShortImageType>::New();
-
+	itk::ImageFileReader<ShortImageType>::Pointer reader 
+		= itk::ImageFileReader<ShortImageType>::New();
+	reader->SetFileName("C:/Users/vsimoes/Downloads/ImageDICOM");
+	reader->SetImageIO(ioObject);
+	reader->Update();
 
 	//Write dimensions and spacing
-	//std::cout << "Dimensions X :" << reader->GetOutput()->GetLargestPossibleRegion().GetSize()[0];
-
+	std::cout << "Dimensions X :" << reader->GetOutput()->GetLargestPossibleRegion().GetSize()[0] << std::endl;
+	std::cout << "Dimensions Y :" << reader->GetOutput()->GetLargestPossibleRegion().GetSize()[1] << std::endl;
+	std::cout << "Spacing X :" << reader->GetOutput()->GetSpacing()[0] << std::endl;
+	std::cout << "Spacing Y :" << reader->GetOutput()->GetSpacing()[1] << std::endl;
 
 	//Check information from the GDCM ImageIO
-	char* patientname = new char;
 	char* patientbirthdate = new char;
 	char* patientid = new char;
 	char* studydate = new char;
+	std::string patientname;
 	std::string modality;
 
 	//Get DICOM data
-	//gdcmImageIO->Get...
+	ioObject->GetValueFromTag("0010|0010", patientname);
+	ioObject->GetPatientDOB(patientbirthdate);
+	ioObject->GetPatientID(patientid);
+	ioObject->GetStudyDate(studydate);
+	ioObject->GetValueFromTag("0008|0060", modality);
 
 	std::cout << "Patient name :" << patientname << std::endl;
-	//...
+	std::cout << "Patient DOB :" << patientbirthdate << std::endl;
+	std::cout << "Patient ID :" << patientid << std::endl;
+	std::cout << "Study Date :" << studydate << std::endl;
+
 	std::cout << "Modality :" << modality.c_str() << std::endl;
 
 
 	//Delete allocated pointers
-	delete[] patientname;
 	delete[] patientbirthdate;
 	delete[] patientid;
 	delete[] studydate;

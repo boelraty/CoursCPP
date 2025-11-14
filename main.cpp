@@ -6,6 +6,7 @@
 /*---- ITK Includes ----*/
 #include <itkImage.h>
 #include <itkImageFileReader.h>
+#include <itkImageFileWriter.h>
 #include <itkGDCMImageIO.h>
 
 /*---- STL Includes ----*/
@@ -34,9 +35,9 @@ int main(int p_argc, char* p_argv[])
 	std::cout << "Spacing Y :" << reader->GetOutput()->GetSpacing()[1] << std::endl;
 
 	//Check information from the GDCM ImageIO
-	char* patientbirthdate = new char;
-	char* patientid = new char;
-	char* studydate = new char;
+	char* patientbirthdate = new char[20];
+	char* patientid = new char[20];
+	char* studydate = new char[20];
 	std::string patientname;
 	std::string modality;
 
@@ -59,5 +60,16 @@ int main(int p_argc, char* p_argv[])
 	delete[] patientbirthdate;
 	delete[] patientid;
 	delete[] studydate;
+
+
+	//Create filter to apply threshold on image
+	//itk::BinaryThresholdImageFilter<ShortImageType, UCharImageType>::Pointer thresholder =
+	//Use reader->GetOutput() as input of thresholder
+
+
+	//Write the binary image
+	itk::ImageFileWriter<UCharImageType>::Pointer writer = itk::ImageFileWriter<UCharImageType>::New();
+	//Refer to ex 3 and use output of thresholder
+
 	return 0;
 }

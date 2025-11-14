@@ -47,40 +47,47 @@ int main(int p_argc, char* p_argv[])
 		thresholder->SetOutsideValue(0);
 		thresholder->Update();
 
+//#include <itkConnectedComponentImageFilter.h>
+//#include <itkRelabelComponentImageFilter.h>
+//#include <itkRescaleIntensityImageFilter.h>
 		//Labelize the image
 		typedef itk::Image<int, 2> IntImageType;
 		typedef itk::ConnectedComponentImageFilter<UCharImageType, IntImageType> LabelerType;
-		itk::ConnectedComponentImageFilter<UCharImageType, IntImageType>::Pointer labeler =
-			itk::ConnectedComponentImageFilter<UCharImageType, IntImageType>::New();
-		//Set input = outout of reader
-
+		LabelerType::Pointer labeler = LabelerType::New();
+		labeler->SetInput(thresholder->GetOutput());
+		labeler->Update();
 
 		//Relabelize the image to get info about the group of found pixels
 		typedef itk::RelabelComponentImageFilter<IntImageType, UCharImageType> RelabelerType;
-		//    itk::RelabelComponentImageFilter<IntImageType, UCharImageType>::Pointer relabeler =
-
-
-		//	std::cout << "Number of found objects :" << relabeler->GetNumberOfObjects() << std::endl;
-		//	for (int i = 0 ; i < relabeler->GetNumberOfObjects() ; ++i)
-		//		std::cout << "Area of objects " << i << ":" << relabeler->GetSizeOfObjectInPhysicalUnits(i) << std::endl;
-
-			//Rescale the image to see colors on labelized output
-		typedef itk::RescaleIntensityImageFilter<UCharImageType, UCharImageType> RescalerType;
-		//    itk::RescaleIntensityImageFilter<UCharImageType, UCharImageType>::Pointer rescaler =
-		//    ...
-
-			//Write the binary image
-		//  itk::ImageFileWriter<UCharImageType>::Pointer writer = itk::ImageFileWriter<UCharImageType>::New();
-		//  //...
-
+		RelabelerType::Pointer relabeler = RelabelerType::New();
+		relabeler->SetInput(labeler->GetOutput());
+		relabeler->SetMinimumObjectSize(100);
+		relabeler->Update();
 
 		//Write the binary image
 		itk::ImageFileWriter<UCharImageType>::Pointer writer
 			= itk::ImageFileWriter<UCharImageType>::New();
-		writer->SetInput(thresholder->GetOutput());
-		writer->SetFileName("image.png");
+		writer->SetInput(relabeler->GetOutput());
+		writer->SetFileName("image0.png");
 		writer->Write();
 
+		std::cout << "Number of found objects :" << relabeler->GetNumberOfObjects() << std::endl;
+		for (int i = 0 ; i < relabeler->GetNumberOfObjects() ; ++i)
+			std::cout << "Area of objects " << i << ":" << relabeler->GetSizeOfObjectInPhysicalUnits(i) << std::endl;
+
+		//Rescale the image to see colors on labelized output
+		typedef itk::RescaleIntensityImageFilter<UCharImageType, UCharImageType> RescalerType;
+		RescalerType::Pointer rescaler = RescalerType::New();
+		rescaler->SetInput(relabeler->GetOutput());
+		rescaler->Update();
+
+		//Write the binary image
+		itk::ImageFileWriter<UCharImageType>::Pointer writer2
+			= itk::ImageFileWriter<UCharImageType>::New();
+		writer2->SetInput(rescaler->GetOutput());
+		writer2->SetFileName("image1.png");
+		writer2->Write();
+	
 	}
 	catch (std::exception& ex)
 	{

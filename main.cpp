@@ -9,6 +9,9 @@
 #include <itkImageFileWriter.h>
 #include <itkGDCMImageIO.h>
 #include <itkBinaryThresholdImageFilter.h>
+#include <itkConnectedComponentImageFilter.h>
+#include <itkRelabelComponentImageFilter.h>
+#include <itkRescaleIntensityImageFilter.h>
 
 /*---- STL Includes ----*/
 #include <string>

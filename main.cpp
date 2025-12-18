@@ -26,5 +26,19 @@ int main(int p_argc, char* p_argv[])
 		<< " ; " << bounds[4] << " ; " << bounds[5] << std::endl;
 
 	std::cout << "Nb of points: " << sphereObject->GetOutput()->GetNumberOfPoints() << std::endl;
+	
+	
+	// Create renderer - ex2
+	//vtkSmartPointer<vtkRenderer> renderer =
+	// Set background color - SetBackgroundColor(R[0-1],G[0-1],B[0-1]);
+
+	// Create render window
+	//vtkSmartPointer<vtkRenderWindow> renderWindow = 
+	// Associate the renderer to the window - Add renderer method
+
+
+	// Start rendering - Method Render()
+	
+	
 	return 0;
 } 

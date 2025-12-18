@@ -19,6 +19,7 @@
 #include <vtkSTLReader.h>
 #include <vtkCutter.h>
 #include <vtkPlane.h>
+#include <vtkClipPolyData.h>
 
 int main(int p_argc, char* p_argv[])
 {
@@ -33,17 +34,18 @@ int main(int p_argc, char* p_argv[])
 	vtkSmartPointer<vtkPlane> plane3 = vtkSmartPointer<vtkPlane>::New();
 	plane3->SetNormal(-1, 1, 0); // sagittal
 
-	vtkSmartPointer<vtkCutter> cutter1 = vtkSmartPointer<vtkCutter>::New();
+	vtkSmartPointer<vtkClipPolyData> cutter1 = vtkSmartPointer<vtkClipPolyData>::New();
 	cutter1->SetInputData(reader1->GetOutput());
-	cutter1->SetCutFunction(plane1);
+	cutter1->SetClipFunction(plane1);
 	cutter1->Update();
-	vtkSmartPointer<vtkCutter> cutter2 = vtkSmartPointer<vtkCutter>::New();
+	vtkSmartPointer<vtkClipPolyData> cutter2 = vtkSmartPointer<vtkClipPolyData>::New();
 	cutter2->SetInputData(reader1->GetOutput());
-	cutter2->SetCutFunction(plane2);
+	cutter2->SetClipFunction(plane2);
 	cutter2->Update();
-	vtkSmartPointer<vtkCutter> cutter3 = vtkSmartPointer<vtkCutter>::New();
+	vtkSmartPointer<vtkClipPolyData> cutter3 = vtkSmartPointer<vtkClipPolyData>::New();
 	cutter3->SetInputData(reader1->GetOutput());
-	cutter3->SetCutFunction(plane3);
+	cutter3->GenerateClippedOutputOn();
+	cutter3->SetClipFunction(plane3);
 	cutter3->Update();
 	
 	vtkSmartPointer<vtkPolyDataMapper> mapper1 = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -61,7 +63,7 @@ int main(int p_argc, char* p_argv[])
 	actor2->GetProperty()->SetColor(0, 1, 0);
 
 	vtkSmartPointer<vtkPolyDataMapper> mapper3 = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper3->SetInputData(cutter3->GetOutput());
+	mapper3->SetInputData(cutter3->GetClippedOutput());
 
 	vtkSmartPointer<vtkActor> actor3 = vtkSmartPointer<vtkActor>::New();
 	actor3->SetMapper(mapper3);
@@ -92,9 +94,9 @@ int main(int p_argc, char* p_argv[])
 	scene->SetBackground(1, 1, 1);
 
 	// Add Actor to scene
-	scene->AddActor(actor1);
-	scene->AddActor(actor2);
 	scene->AddActor(actor3);
+	//scene->AddActor(actor2);
+	//scene->AddActor(actor3);
 	scene->AddActor(actor4);
 	scene->AddActor(actor5);
 

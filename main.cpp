@@ -6,6 +6,9 @@
 /*---- VTK Includes ----*/
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+
 
 int main(int p_argc, char* p_argv[])
 {
@@ -27,17 +30,20 @@ int main(int p_argc, char* p_argv[])
 
 	std::cout << "Nb of points: " << sphereObject->GetOutput()->GetNumberOfPoints() << std::endl;
 	
-	
+//#include <vtkRenderer.h>
+//#include <vtkRenderWindow.h>
 	// Create renderer - ex2
-	//vtkSmartPointer<vtkRenderer> renderer =
+	vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
 	// Set background color - SetBackgroundColor(R[0-1],G[0-1],B[0-1]);
+	renderer->SetBackground(1, 1, 1);
 
 	// Create render window
-	//vtkSmartPointer<vtkRenderWindow> renderWindow = 
+	vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
 	// Associate the renderer to the window - Add renderer method
-
+	renderWindow->AddRenderer(renderer);
 
 	// Start rendering - Method Render()
+	renderer->Render();
 	
 	
 	return 0;

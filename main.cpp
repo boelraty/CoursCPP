@@ -15,38 +15,34 @@
 #include <vtkLight.h>
 #include <vtkProperty.h>
 #include <vtkAxesActor.h>
+#include <vtkSTLWriter.h>
+#include <vtkSTLReader.h>
 
 
 int main(int p_argc, char* p_argv[])
 {
-	// Create a sphere
-	typedef vtkSmartPointer<vtkSphereSource> Sphere;
-	Sphere sphereObject = Sphere::New();
-	sphereObject->SetCenter(20, 30, 40);
-	sphereObject->SetRadius(50);
-	sphereObject->SetPhiResolution(100);
-	sphereObject->SetThetaResolution(100);
-	sphereObject->Update();
+	vtkSmartPointer<vtkSTLReader> reader1 = vtkSmartPointer<vtkSTLReader>::New();
+	reader1->SetFileName("C:/Users/vsimoes/OneDrive - Stryker/Documents/CoursISEN/Data/scapula.stl");
+	reader1->Update();
+	
+	vtkSmartPointer<vtkPolyDataMapper> mapper1 = vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper1->SetInputData(reader1->GetOutput());
 
-	// Get bounds of resulting polydata
-	double* bounds = sphereObject->GetOutput()->GetBounds();
+	vtkSmartPointer<vtkActor> actor1 = vtkSmartPointer<vtkActor>::New();
+	actor1->SetMapper(mapper1);
+	actor1->GetProperty()->SetColor(0.87, 0.83, 0.69);
 
-	std::cout << "Limites: " << bounds[0] << " ; " << bounds[1] << " ; "
-		<< bounds[2] << " ; " << bounds[3]
-		<< " ; " << bounds[4] << " ; " << bounds[5] << std::endl;
+	vtkSmartPointer<vtkSTLReader> reader2 = vtkSmartPointer<vtkSTLReader>::New();
+	reader2->SetFileName("C:/Users/vsimoes/OneDrive - Stryker/Documents/CoursISEN/Data/humerus.stl");
+	reader2->Update();
 
-	std::cout << "Nb of points: " << sphereObject->GetOutput()->GetNumberOfPoints() << std::endl;
+	vtkSmartPointer<vtkPolyDataMapper> mapper2 = vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper2->SetInputData(reader2->GetOutput());
 
-	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputData(sphereObject->GetOutput());
+	vtkSmartPointer<vtkActor> actor2 = vtkSmartPointer<vtkActor>::New();
+	actor2->SetMapper(mapper2);
+	actor2->GetProperty()->SetColor(0.87, 0.83, 0.69);
 
-	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-	actor->SetMapper(mapper);
-	actor->GetProperty()->SetColor(1, 0, 1);
-	actor->GetProperty()->SetOpacity(0.5);
-
-	vtkSmartPointer<vtkAxesActor> axesActor = vtkSmartPointer<vtkAxesActor>::New();
-	axesActor->SetTotalLength(100, 100, 100);
 
 	// Create renderer - ex2
 	vtkSmartPointer<vtkRenderer> scene = vtkSmartPointer<vtkRenderer>::New();
@@ -54,8 +50,8 @@ int main(int p_argc, char* p_argv[])
 	scene->SetBackground(1, 1, 1);
 
 	// Add Actor to scene
-	scene->AddActor(actor);
-	scene->AddActor(axesActor);
+	scene->AddActor(actor1);
+	scene->AddActor(actor2);
 
 	// Create render window
 	vtkSmartPointer<vtkRenderWindow> window = vtkSmartPointer<vtkRenderWindow>::New();

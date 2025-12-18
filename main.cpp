@@ -5,14 +5,26 @@
 
 /*---- VTK Includes ----*/
 #include <vtkSmartPointer.h>
+#include <vtkSphereSource.h>
 
 int main(int p_argc, char* p_argv[])
 {
 	// Create a sphere
-	vtkSmartPointer<vtkSphereSource> sphereObject = vtkSmartPointer<vtkSphereSource>::New();
-
+	typedef vtkSmartPointer<vtkSphereSource> Sphere;
+	Sphere sphereObject = Sphere::New();
+	sphereObject->SetCenter(20, 30, 40);
+	sphereObject->SetRadius(50);
+	sphereObject->SetPhiResolution(100);
+	sphereObject->SetThetaResolution(100);
+	sphereObject->Update();
 
 	// Get bounds of resulting polydata
+	double* bounds = sphereObject->GetOutput()->GetBounds();
 
+	std::cout << "Limites: " << bounds[0] << " ; " << bounds[1] << " ; "
+		<< bounds[2] << " ; " << bounds[3]
+		<< " ; " << bounds[4] << " ; " << bounds[5] << std::endl;
+
+	std::cout << "Nb of points: " << sphereObject->GetOutput()->GetNumberOfPoints() << std::endl;
 	return 0;
 } 

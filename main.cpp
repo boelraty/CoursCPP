@@ -14,6 +14,7 @@
 #include <vtkCamera.h>
 #include <vtkLight.h>
 #include <vtkProperty.h>
+#include <vtkAxesActor.h>
 
 
 int main(int p_argc, char* p_argv[])
@@ -41,27 +42,26 @@ int main(int p_argc, char* p_argv[])
 
 	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
 	actor->SetMapper(mapper);
-	actor->GetProperty()->SetColor(1, 1, 1);
+	actor->GetProperty()->SetColor(1, 0, 1);
+	actor->GetProperty()->SetOpacity(0.5);
+
+	vtkSmartPointer<vtkAxesActor> axesActor = vtkSmartPointer<vtkAxesActor>::New();
+	axesActor->SetTotalLength(100, 100, 100);
 
 	// Create renderer - ex2
 	vtkSmartPointer<vtkRenderer> scene = vtkSmartPointer<vtkRenderer>::New();
 	// Set background color - SetBackgroundColor(R[0-1],G[0-1],B[0-1]);
-	scene->SetBackground(0.3, 0.3, 0.3);
+	scene->SetBackground(1, 1, 1);
 
 	// Add Actor to scene
 	scene->AddActor(actor);
-	
-	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
-	light->SetPosition(100, 0, 0);
-	light->SetIntensity(1);
-	scene->AddLight(light);
+	scene->AddActor(axesActor);
 
 	// Create render window
 	vtkSmartPointer<vtkRenderWindow> window = vtkSmartPointer<vtkRenderWindow>::New();
 	// Associate the renderer to the window - Add renderer method
 	window->AddRenderer(scene);
 
-//#include <vtkRenderWindowInteractor.h>
 	vtkSmartPointer<vtkRenderWindowInteractor> interactor 
 		= vtkSmartPointer<vtkRenderWindowInteractor>::New();
 	interactor->SetRenderWindow(window);

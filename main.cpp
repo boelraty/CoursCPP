@@ -8,6 +8,8 @@
 #include <vtkSphereSource.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
 
 
 int main(int p_argc, char* p_argv[])
@@ -29,13 +31,22 @@ int main(int p_argc, char* p_argv[])
 		<< " ; " << bounds[4] << " ; " << bounds[5] << std::endl;
 
 	std::cout << "Nb of points: " << sphereObject->GetOutput()->GetNumberOfPoints() << std::endl;
-	
-//#include <vtkRenderer.h>
-//#include <vtkRenderWindow.h>
+
+//#include <vtkPolyDataMapper.h>
+//#include <vtkActor.h>
+	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper->SetInputData(sphereObject->GetOutput());
+
+	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+	actor->SetMapper(mapper);
+
 	// Create renderer - ex2
 	vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
 	// Set background color - SetBackgroundColor(R[0-1],G[0-1],B[0-1]);
 	renderer->SetBackground(1, 1, 1);
+
+	// Add Actor to scene
+	renderer->AddActor(actor);
 
 	// Create render window
 	vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();

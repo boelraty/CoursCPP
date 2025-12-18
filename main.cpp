@@ -10,17 +10,19 @@
 #include <vtkRenderWindow.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
+#include <vtkRenderWindowInteractor.h>
 
 
 int main(int p_argc, char* p_argv[])
 {
+
 	// Create a sphere
 	typedef vtkSmartPointer<vtkSphereSource> Sphere;
 	Sphere sphereObject = Sphere::New();
 	sphereObject->SetCenter(20, 30, 40);
 	sphereObject->SetRadius(50);
-	sphereObject->SetPhiResolution(100);
-	sphereObject->SetThetaResolution(100);
+	sphereObject->SetPhiResolution(10);
+	sphereObject->SetThetaResolution(10);
 	sphereObject->Update();
 
 	// Get bounds of resulting polydata
@@ -32,8 +34,6 @@ int main(int p_argc, char* p_argv[])
 
 	std::cout << "Nb of points: " << sphereObject->GetOutput()->GetNumberOfPoints() << std::endl;
 
-//#include <vtkPolyDataMapper.h>
-//#include <vtkActor.h>
 	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 	mapper->SetInputData(sphereObject->GetOutput());
 
@@ -41,21 +41,27 @@ int main(int p_argc, char* p_argv[])
 	actor->SetMapper(mapper);
 
 	// Create renderer - ex2
-	vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
+	vtkSmartPointer<vtkRenderer> scene = vtkSmartPointer<vtkRenderer>::New();
 	// Set background color - SetBackgroundColor(R[0-1],G[0-1],B[0-1]);
-	renderer->SetBackground(1, 1, 1);
+	scene->SetBackground(0, 1, 1);
 
 	// Add Actor to scene
-	renderer->AddActor(actor);
+	scene->AddActor(actor);
 
 	// Create render window
-	vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+	vtkSmartPointer<vtkRenderWindow> window = vtkSmartPointer<vtkRenderWindow>::New();
 	// Associate the renderer to the window - Add renderer method
-	renderWindow->AddRenderer(renderer);
+	window->AddRenderer(scene);
+
+//#include <vtkRenderWindowInteractor.h>
+	vtkSmartPointer<vtkRenderWindowInteractor> interactor 
+		= vtkSmartPointer<vtkRenderWindowInteractor>::New();
+	interactor->SetRenderWindow(window);
 
 	// Start rendering - Method Render()
-	renderer->Render();
+	window->Render();
 	
+	interactor->Start();
 	
 	return 0;
 } 

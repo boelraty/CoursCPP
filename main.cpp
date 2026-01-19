@@ -1,72 +1,42 @@
 //-------------------------------------------------------------------------------------------------------------------
-/*!	\brief	Exemple12
+/*!	\brief	Exemple13
 *	\file	main.cpp
 *///-----------------------------------------------------------------------------------------------------------------
 
 /*---- VTK Includes ----*/
 #include <vtkActor.h>
-#include <vtkDecimatePro.h>
-#include <vtkImageData.h>
-#include <vtkMarchingCubes.h>
-#include <vtkPointData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
-#include <vtkUnsignedCharArray.h>
+#include <vtkCubeSource.h>
+#include <vtkSphereSource.h>
+
 
 
 int main(int p_argc, char* p_argv[])
 {
-	// Create vtkImageData
-	vtkSmartPointer<vtkImageData> data = vtkSmartPointer<vtkImageData>::New();
-	data->SetOrigin(0, 0, 0);
-	data->SetDimensions(100, 100, 100);
-	data->SetSpacing(0.5, 0.5, 0.5);
+	// Create a sphere - radius = 50
+	vtkSmartPointer<vtkSphereSource> sphereObject = //...
 
-	// Fill the image data
-	vtkSmartPointer<vtkUnsignedCharArray> scalars = vtkSmartPointer<vtkUnsignedCharArray>::New();
-	scalars->SetNumberOfValues(100 * 100 * 100);
+	// Create a aphere  - radius = 45
+	vtkSmartPointer<vtkSphereSource> sphereObject2 = //...
 
-	for (int i = 0; i < 100; ++i)
-	{
-		for (int j = 0; j < 100; ++j)
-		{
-			for (int k = 0; k < 100; ++k)
-			{
-				if (k > 40 && k < 60 && j > 30 && j < 70 && i > 20 && i < 80)
-					scalars->SetValue(k + j * 100 + i * 100 * 100, 1);
-				else scalars->SetValue(k + j * 100 + i * 100 * 100, 0);
-			}
-		}
-	}
-	data->GetPointData()->SetScalars(scalars);
-
-	//Create mesh related to image data
-	vtkSmartPointer<vtkMarchingCubes> marchingcubes = vtkSmartPointer<vtkMarchingCubes>::New();
-	marchingcubes->SetInputData(data);
-	marchingcubes->SetValue(0, 1);
-	marchingcubes->Update();
-
-	std::cout << "Before decimater:" << marchingcubes->GetOutput()->GetNumberOfPoints() << std::endl;
-
-	vtkSmartPointer<vtkDecimatePro> decimater = vtkSmartPointer<vtkDecimatePro>::New();
-	decimater->SetInputData(marchingcubes->GetOutput());
-	decimater->SetTargetReduction(0.9);
-	decimater->Update();
-
-	std::cout << "After decimater: " << decimater->GetOutput()->GetNumberOfPoints() << std::endl;
+	vtkSmartPointer<vtkBooleanOperationPolyDataFilter> booleanFilter = //...
 
 	// Create mapper for the sphere
-	vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-	mapper->SetInputData(decimater->GetOutput());
+	vtkSmartPointer<vtkPolyDataMapper> mapper = //...
 
 	// Create actor related to previous mapper
-	vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-	actor->SetMapper(mapper);
-	actor->GetProperty()->SetColor(0.87, 0.83, 0.69);
+	vtkSmartPointer<vtkActor> actor = //...
+
+	// Create renderer
+	vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
+
+	// Set background color
+	renderer->SetBackground(1, 1, 1);
 
 	// Create renderer
 	vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
@@ -84,7 +54,6 @@ int main(int p_argc, char* p_argv[])
 	interactorWindow->SetRenderWindow(renderWindow);
 
 	// Add actor to renderer
-	renderer->AddActor(actor);
 
 	// Start rendering
 	renderWindow->Render();

@@ -128,8 +128,8 @@ std::vector<std::string> getListOfFiles(const std::string& p_inputDirectory)
 {
     //Search all files in the directory
     std::vector<std::string> listOfFiles;
-    /*for (const auto& file : std::filesystem::directory_iterator{ p_inputDirectory })
-        listOfFiles.push_back(file.path().string());*/
+    for (const auto& file : std::filesystem::directory_iterator{ p_inputDirectory })
+        listOfFiles.push_back(file.path().string());
 
     std::cout << "Number of files found: " << listOfFiles.size() << std::endl;
 

@@ -40,7 +40,7 @@ int main(int p_argc, char* p_argv[])
 		= vtkSmartPointer<vtkBooleanOperationPolyDataFilter>::New();
 	booleanFilter->SetInputData(0, sphereObject->GetOutput());
 	booleanFilter->SetInputData(1, sphereObject2->GetOutput());
-	booleanFilter->SetOperationToUnion();
+	booleanFilter->SetOperationToUnion(); //SetOperationToDifference(); SetOperationToUnion();
 	booleanFilter->Update();
 
 	// Create mapper for the sphere

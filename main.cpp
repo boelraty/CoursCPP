@@ -4,58 +4,116 @@
 *///-----------------------------------------------------------------------------------------------------------------
 
 /*---- ITK Includes ----*/
+#include <itkGDCMImageIO.h>
 #include <itkImage.h>
+#include <itkImageFileReader.h>
 
+#include <cstdlib>
+#include <iomanip>
 #include <iostream>
-
-/*---- VTK Includes ----*/
-#include <vtkPolyData.h>
-#include <vtkSmartPointer.h>
+#include <string>
 
 int main(int p_argc, char* p_argv[])
 {
-	std::cout << "Starting test ..." << std::endl;
-	
-	// Definit une image 2D dont chaque pixel contient un entier signe de type short.
-	using ImageType = itk::Image<short, 2>;
-	// Cree l'objet image ; le buffer de pixels n'est pas encore alloue.
-	ImageType::Pointer image = ImageType::New();
+	if (p_argc > 2)
+	{
+		std::cerr << "Usage : " << p_argv[0] << " [fichier-dicom]" << std::endl;
+		return EXIT_FAILURE;
+	}
 
-	// Fixe le premier indice de la region a (0, 0), sans definir l'origine physique.
-	ImageType::IndexType start;
-	start.Fill(0);
+	// The shell does not expand ~ inside a C++ string.
+	std::string filename;
+	if (p_argc == 2)
+	{
+		filename = p_argv[1];
+	}
+	else
+	{
+		const char* home = std::getenv("HOME");
+		if (home == nullptr || home[0] == '\0')
+		{
+			std::cerr << "HOME non defini : fournir le chemin du fichier DICOM."
+			          << std::endl;
+			return EXIT_FAILURE;
+		}
+		filename = std::string(home) + "/Downloads/ImageDICOM";
+	}
 
-	// Fixe le nombre de pixels a 512 sur chacun des deux axes.
-	ImageType::SizeType size;
-	size.Fill(512);
+	// A depth of 1 preserves the 3D origin and orientation of a single slice
+	// in the patient's physical coordinate system.
+	using ImageType = itk::Image<short, 3>;
+	using ReaderType = itk::ImageFileReader<ImageType>;
+	auto dicomIO = itk::GDCMImageIO::New();
+	auto reader = ReaderType::New();
+	reader->SetImageIO(dicomIO);
+	reader->SetFileName(filename);
 
-	// La region associe l'indice de depart et la taille de l'image.
-	ImageType::RegionType region;
-	region.SetIndex(start);
-	region.SetSize(size);
-	image->SetRegions(region);
+	// Update reads the metadata and allocates/fills the buffer from the file.
+	try
+	{
+		reader->Update();
+	}
+	catch (const itk::ExceptionObject& error)
+	{
+		std::cerr << "Echec de la lecture DICOM : " << error << std::endl;
+		return EXIT_FAILURE;
+	}
 
-	// Le spacing est la distance physique entre deux pixels voisins.
-	// Un champ de 270 mm sur 512 pixels donne 0.52734375 mm par pixel.
-	ImageType::SpacingType spacing;
-	spacing[0] = 270.0 / size[0];
-	spacing[1] = 270.0 / size[1];
-	image->SetSpacing(spacing);
-
-	// Alloue le buffer en memoire, puis initialise tous les pixels a -850.
-	image->Allocate();
-	image->FillBuffer(-850);
-	std::cout << "ITK OK" << std::endl;
-
-	// Relit les dimensions et le spacing depuis l'image pour les afficher.
+	const auto image = reader->GetOutput();
 	const auto imageSize = image->GetLargestPossibleRegion().GetSize();
 	const auto imageSpacing = image->GetSpacing();
-	// GetPixel utilise un indice : start designe ici le premier pixel, en (0, 0).
-	std::cout << "Premier voxel : " << image->GetPixel(start) << std::endl;
+	const auto imageOrigin = image->GetOrigin();
+	std::cout << std::setprecision(10);
 	std::cout << "Dimensions : " << imageSize[0] << " x " << imageSize[1]
-	          << " pixels" << std::endl;
+	          << " x " << imageSize[2] << " voxels" << std::endl;
 	std::cout << "Spacing : " << imageSpacing[0] << " x " << imageSpacing[1]
-	          << " mm/pixel" << std::endl;
+	          << " x " << imageSpacing[2] << " mm" << std::endl;
+	std::cout << "Origin : " << imageOrigin << " mm" << std::endl;
 
-	return 0;
-} 
+	// DICOM identifiers use the group|element format.
+	// Missing or empty values are reported without inventing a default value.
+	const auto printTag = [&dicomIO](const char* tag, const char* label)
+	{
+		std::string value;
+		std::cout << label << " (" << tag << ") : ";
+		if (dicomIO->GetValueFromTag(tag, value) &&
+		    value.find_first_not_of(" \t\r\n") != std::string::npos)
+		{
+			std::cout << value;
+		}
+		else
+		{
+			std::cout << "[absent ou vide]";
+		}
+		std::cout << std::endl;
+	};
+
+	std::cout << "\nTags DICOM :" << std::endl;
+	printTag("0008|0060", "Modality");
+	printTag("0010|0010", "Patient Name");
+	printTag("0010|0030", "Patient Birth Date");
+	printTag("0008|0022", "Acquisition Date (date du scan)");
+	printTag("0008|0020", "Study Date (date de l'etude)");
+	printTag("0020|0032", "Image Position (Patient)");
+	printTag("0028|0030", "Pixel Spacing (ligne, colonne)");
+	printTag("0028|0010", "Rows");
+	printTag("0028|0011", "Columns");
+
+	// The physical field of view is size * spacing along the image axes.
+	// The Pixel Spacing tag uses row/column order, unlike the X/Y axes.
+	std::cout << "\nTaille physique du champ (X x Y) : "
+	          << imageSize[0] * imageSpacing[0] << " x "
+	          << imageSize[1] * imageSpacing[1] << " mm" << std::endl;
+	if (imageSize[2] > 1)
+	{
+		std::cout << "Taille physique du champ en Z : "
+		          << imageSize[2] * imageSpacing[2] << " mm" << std::endl;
+	}
+	else
+	{
+		// The Z spacing of a single slice does not guarantee its physical thickness.
+		printTag("0018|0050", "Slice Thickness (mm)");
+	}
+
+	return EXIT_SUCCESS;
+}

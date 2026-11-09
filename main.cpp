@@ -5,8 +5,9 @@
 
 /*---- ITK Includes ----*/
 #include <itkGDCMImageIO.h>
+#include <itkGDCMSeriesFileNames.h>
 #include <itkImage.h>
-#include <itkImageFileReader.h>
+#include <itkImageSeriesReader.h>
 
 #include <cstdlib>
 #include <iomanip>
@@ -17,41 +18,69 @@ int main(int p_argc, char* p_argv[])
 {
 	if (p_argc > 2)
 	{
-		std::cerr << "Usage : " << p_argv[0] << " [fichier-dicom]" << std::endl;
+		std::cerr << "Usage : " << p_argv[0]
+		          << " [dossier-dicom]" << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	// The shell does not expand ~ inside a C++ string.
-	std::string filename;
-	if (p_argc == 2)
+	std::string directory;
+	if (p_argc >= 2)
 	{
-		filename = p_argv[1];
+		directory = p_argv[1];
 	}
 	else
 	{
 		const char* home = std::getenv("HOME");
 		if (home == nullptr || home[0] == '\0')
 		{
-			std::cerr << "HOME non defini : fournir le chemin du fichier DICOM."
+			std::cerr << "HOME non defini : fournir le chemin du dossier DICOM."
 			          << std::endl;
 			return EXIT_FAILURE;
 		}
-		filename = std::string(home) + "/Downloads/ImageDICOM";
+		directory = std::string(home) + "/Data/ShoulderCases/Patient521/DICOM/Raw2";
 	}
 
-	// A depth of 1 preserves the 3D origin and orientation of a single slice
-	// in the patient's physical coordinate system.
 	using ImageType = itk::Image<short, 3>;
-	using ReaderType = itk::ImageFileReader<ImageType>;
+	using ReaderType = itk::ImageSeriesReader<ImageType>;
+	auto seriesNames = itk::GDCMSeriesFileNames::New();
 	auto dicomIO = itk::GDCMImageIO::New();
 	auto reader = ReaderType::New();
 	reader->SetImageIO(dicomIO);
-	reader->SetFileName(filename);
 
-	// Update reads the metadata and allocates/fills the buffer from the file.
 	try
 	{
+		seriesNames->SetDirectory(directory);
+		const auto& seriesUIDs = seriesNames->GetSeriesUIDs();
+		if (seriesUIDs.empty())
+		{
+			std::cerr << "Aucune serie DICOM trouvee dans : " << directory << std::endl;
+			return EXIT_FAILURE;
+		}
+
+		if (seriesUIDs.size() > 1)
+		{
+			std::cerr << "Plusieurs series DICOM : fournir un dossier contenant une seule serie."
+			          << std::endl;
+			for (const auto& uid : seriesUIDs)
+			{
+				std::cerr << "  " << uid << std::endl;
+			}
+			return EXIT_FAILURE;
+		}
+
+		const auto& seriesUID = seriesUIDs.front();
+		// GDCM sorts slices by their physical position, not by filename.
+		const auto& filenames = seriesNames->GetFileNames(seriesUID);
+		if (filenames.empty())
+		{
+			std::cerr << "Aucun fichier DICOM pour la serie : " << seriesUID << std::endl;
+			return EXIT_FAILURE;
+		}
+		reader->SetFileNames(filenames);
 		reader->Update();
+		std::cout << "Serie DICOM : " << seriesUID << std::endl;
+		std::cout << "Nombre de fichiers : " << filenames.size() << std::endl;
 	}
 	catch (const itk::ExceptionObject& error)
 	{
@@ -88,7 +117,7 @@ int main(int p_argc, char* p_argv[])
 		std::cout << std::endl;
 	};
 
-	std::cout << "\nTags DICOM :" << std::endl;
+	std::cout << "\nTags DICOM (derniere coupe lue) :" << std::endl;
 	printTag("0008|0060", "Modality");
 	printTag("0010|0010", "Patient Name");
 	printTag("0010|0030", "Patient Birth Date");
